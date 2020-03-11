@@ -1,0 +1,47 @@
+1. returnSet
+    **List of nodes, and total profit and weights in the list**
+    Constructor                                                                         O(1)
+    addNode: node id, profit, weight                                                    O(1)
+    addReturnSet: Merge two return sets                                                 O(size of another set)
+    isEmpty                                                                             O(1)
+    clear                                                                               O(1)
+
+2. Node:
+    **node id, profit and weight
+    node id is unique (which maybe outfit id)**
+
+3. graph:
+    **list of nodes
+    degree of each node
+    adjacency representation of graph with respect of index in the list of nodes
+    index of particular node id in list of nodes
+    active nodes in graph**
+    addNode: add new node in the graph                                                  O(log n)
+    addEdge: add new edge in the graph                                                  O(log n)
+    getProfit: returns profit associated with node id                                   O(log n)
+    getWeight: returns weight associated with node id                                   O(log n)
+    remove: deletes given list of nodes from the graph                                  O(n log n)
+    getNeighbours: returns 1-Neighbour set                                              O(n log n)
+
+4. PROFIT KNAPSACK:
+    **returns returnSet of node ids with maximum profit under budget**
+    Space Complexity                                                                    O(n^2)
+    Time Complexity                                                                     O(n^2)
+
+5. RATIO KNAPSACK:
+    **returns returnSet of node ids with maximum profit/weight under budget**
+    Space Complexity                                                                    O(n^2)
+    Time Complexity                                                                     O(n^2)
+
+6. BEST PROFIT VIABLE
+    **returns returnSet of node ids with maximum profit Star under budget**
+    Time Complexity                                                                     O(n^2)
+
+6. BEST RATIO VIABLE
+    **returns returnSet of node ids with maximum profit/weight ratio Star under budget**
+    Time Complexity                                                                     O(n^2)
+
+7. GREEDY_1_NEIGHBOUR
+    **Greedy Approximation Solution**
+    Bound:                                                                              1-1/e
+    Time Complexity:                                                                    O(n^3)
