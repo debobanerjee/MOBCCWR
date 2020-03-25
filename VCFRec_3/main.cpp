@@ -203,19 +203,60 @@ void solve() {
     To.clear();
 }
 
+void printSolGUI(graph &G, int budget) {
+    returnSet U = GREEDY_VCFREC3(G, budget);
+    assert(verify(U, G, budget));
+    vector<int> items[3];
+    for(int u : U.returnNodes) {
+        items[G.getType(u)].push_back(u);
+    }
+
+    for(int t : items[0]) {
+        for(int b : items[1]) {
+            for(int f : items[2]) {
+                if(G.isTriangle(t, b, f)) {
+                    cout << t << " " << b << " " << f << "\n";
+                }
+            }
+        }
+    }
+}
+
+void solveGUI() {
+    int n, m; cin >> n >> m;
+    graph G;
+    for(int i = 0; i < n; i++) {
+        int u, w, type; cin >> u >> w >> type;
+        G.addNode(u, 0, w, type);
+    }
+    for(int i = 0; i < m; i++) {
+        int t, b, f, v; cin >> t >> b >> f >> v;
+        G.addEdge(t, b);
+        G.addEdge(t, f);
+        G.addEdge(b, f);
+        To.addOutfit(t, b, f, v);
+    }
+    int alpha, beta;
+    int budget = 800; cin >> alpha >> beta >> budget;
+    ALPHA = alpha;
+    BETA = beta;
+    printSolGUI(G, budget);
+    To.clear();
+}
+
 signed main()
 {
-    freopen("random_input", "r", stdin);
-    freopen("greedy_result", "w", stdout);
+    //freopen("real_data", "r", stdin);
+    //freopen("greedy_result", "w", stdout);
 
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    int test = 1; cin >> test;
+    int test = 1; //cin >> test;
     for(int cur_test = 1; cur_test <= test; cur_test++) {
         timer.reset();
-        solve();
-        cerr << "Done: " << cur_test << " in " << timer.elapsed() << ".\n";
+        solveGUI();
+        //cerr << "Done: " << cur_test << " in " << timer.elapsed() << ".\n";
     }
 
     return 0;
