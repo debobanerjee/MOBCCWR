@@ -17,14 +17,19 @@ import cv2
 import csv
 import subprocess
 
+error = np.zeros((200, 200, 3), np.uint8)
+error[:] = (255, 255, 255)
+
 def url_to_image(url, readFlag=cv2.IMREAD_COLOR):
     # download the image, convert it to a NumPy array, and then read
     # it into OpenCV format
-    req = Request(url=url, headers = headers)
-    resp = urlopen(req)
-    image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    image = cv2.imdecode(image, readFlag)
-
+    try:
+        req = Request(url=url, headers = headers)
+        resp = urlopen(req)
+        image = np.asarray(bytearray(resp.read()), dtype="uint8")
+        image = cv2.imdecode(image, readFlag)
+    except:
+        image = error
     # return the image
     return image
 
@@ -117,16 +122,23 @@ def opinion():
 
 def display_image(urltop, urlbottom, urlfoot):
     isFirst = TRUE;
+    marked = []
     for url in urltop:
         print("downloading %s" % (url))
         image = url_to_image(url)
         if isFirst == TRUE:
             top = image
             isFirst = FALSE
+            uqtop = image
+            marked.append(url)
             continue
         top = np.concatenate((top, image), axis = 1)
-    cv2.imshow("Top wear", top)
+        if url not in marked:
+            uqtop = np.concatenate((uqtop, image), axis = 1)
+            marked.append(url)
+    cv2.imshow("Top wear", uqtop)
     
+    marked.clear()
     isFirst = TRUE
     for url in urlbottom:
         print("downloading %s" % (url))
@@ -134,10 +146,16 @@ def display_image(urltop, urlbottom, urlfoot):
         if isFirst == TRUE:
             bottom = image
             isFirst = FALSE
+            uqbottom = image
+            marked.append(url)
             continue
         bottom = np.concatenate((bottom, image), axis = 1)
-    cv2.imshow("Bottom wear", bottom)
+        if url not in marked:
+            uqbottom = np.concatenate((uqbottom, image), axis = 1)
+            marked.append(url)
+    cv2.imshow("Bottom wear", uqbottom)
     
+    marked.clear()
     isFirst = TRUE
     for url in urlfoot:
         print("downloading %s" % (url))
@@ -145,9 +163,14 @@ def display_image(urltop, urlbottom, urlfoot):
         if isFirst == TRUE:
             foot = image
             isFirst = FALSE
+            uqfoot = image
+            marked.append(url)
             continue
         foot = np.concatenate((foot, image), axis = 1)
-    cv2.imshow("Foot wear", foot)
+        if url not in marked:
+            uqfoot = np.concatenate((uqfoot, image), axis = 1)
+            marked.append(url)
+    cv2.imshow("Foot wear", uqfoot)
     
     outfit = top
     outfit = np.concatenate((outfit, bottom), axis = 0)
