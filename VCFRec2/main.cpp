@@ -1,8 +1,10 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define ALPHA 8
-#define BETA 3
+const int N = 1510;
+
+int ALPHA = 1;
+int BETA = 1;
 
 /** To check Time Limit **/
 class Timer {
@@ -92,6 +94,12 @@ struct graph {
         return nodes[indexInNodes[node]].w;
     }
 
+    bool isConnected(int u, int v) {
+        int x = indexInNodes[u];
+        int y = indexInNodes[v];
+        return adj[x].find(y) != adj[x].end();
+    }
+
     bool isActiveIndex(int u) {
         int x = nodes[u].u;
         return activeNodes.find(x) != activeNodes.end();
@@ -134,18 +142,19 @@ struct graph {
     }
 };
 
-returnSet PROFIT_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> &weights, int budget, int CLIMIT,
-        int PLIMIT) {
+int dp[N][10 * N], last[N][10 * N];
+
+returnSet PROFIT_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> &weights, int budget) {
+
     assert((int)nodes.size() == (int)profits.size());
     assert((int)nodes.size() == (int)weights.size());
 
     int n = (int)nodes.size();
-    int M = CLIMIT * ALPHA + PLIMIT * BETA;
-    int dp[n + 1][M + 1], last[n + 1][M + 1];
-    int INF = budget + 1;
+    int M = budget;
+
     for(int i = 0; i <= n; i++) {
         for(int j = 0; j <= M; j++) {
-            dp[i][j] = INF;
+            dp[i][j] = 0;
             last[i][j] = -1;
         }
     }
@@ -155,19 +164,21 @@ returnSet PROFIT_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> 
             dp[i][j] = dp[i - 1][j];
         }
         for(int j = 0; j <= M; j++) {
-            int x = j + profits[i - 1];
+            int x = j + weights[i - 1];
             if(x <= M) {
-                if(dp[i][x] > dp[i - 1][j] + weights[i - 1]) {
-                    dp[i][x] = dp[i - 1][j] + weights[i - 1];
+                if(dp[i][x] < dp[i - 1][j] + profits[i - 1]) {
+                    dp[i][x] = dp[i - 1][j] + profits[i - 1];
                     last[i][x] = i;
                 }
             }
         }
     }
     pair<int,int> knapsack_sol = {0, 0};
-    for(int j = 0; j <= M; j++) {
-        for(int i = 0; i <= n; i++) {
-            if(dp[i][j] <= budget && last[i][j] != -1) {
+    for(int i = 0; i <= n; i++) {
+        for(int j = 0; j <= M; j++) {
+            int x = knapsack_sol.first;
+            int y = knapsack_sol.second;
+            if(dp[x][y] < dp[i][j] && last[i][j] != -1) {
                 knapsack_sol = {i, j};
             }
         }
@@ -179,7 +190,7 @@ returnSet PROFIT_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> 
     while(true) {
         if(!x && !y) break;
         U.addNode(nodes[x - 1], profits[x - 1], weights[x - 1]);
-        y -= profits[x - 1];
+        y -= weights[x - 1];
         x--;
         while(last[x][y] == -1) x--;
     }
@@ -188,17 +199,16 @@ returnSet PROFIT_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> 
 }
 
 returnSet RATIO_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> &weights, int budget,
-        int off_p, int off_w, int CLIMIT, int PLIMIT) {
+                         int off_p, int off_w) {
     assert((int)nodes.size() == (int)profits.size());
     assert((int)nodes.size() == (int)weights.size());
 
     int n = (int)nodes.size();
-    int M = CLIMIT * ALPHA + PLIMIT * BETA;
-    int dp[n + 1][M + 1], last[n + 1][M + 1];
-    int INF = budget + 1;
+    int M = budget;
+
     for(int i = 0; i <= n; i++) {
         for(int j = 0; j <= M; j++) {
-            dp[i][j] = INF;
+            dp[i][j] = 0;
             last[i][j] = -1;
         }
     }
@@ -208,10 +218,10 @@ returnSet RATIO_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> &
             dp[i][j] = dp[i - 1][j];
         }
         for(int j = 0; j <= M; j++) {
-            int x = j + profits[i - 1];
+            int x = j + weights[i - 1];
             if(x <= M) {
-                if(dp[i][x] > dp[i - 1][j] + weights[i - 1]) {
-                    dp[i][x] = dp[i - 1][j] + weights[i - 1];
+                if(dp[i][x] < dp[i - 1][j] + profits[i - 1]) {
+                    dp[i][x] = dp[i - 1][j] + profits[i - 1];
                     last[i][x] = i;
                 }
             }
@@ -221,14 +231,14 @@ returnSet RATIO_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> &
     pair<int,int> knapsack_wt = {0, 0};
     for(int j = 0; j <= M; j++) {
         for(int i = 1; i <= n; i++) {
-            if(dp[i][j] <= budget && last[i][j] != -1) {
+            if(last[i][j] != -1) {
                 if(!knapsack_sol.first && !knapsack_sol.second) {
                     knapsack_sol = {i, j};
-                    knapsack_wt = {j + off_p, dp[i][j] + off_w};
+                    knapsack_wt = {dp[i][j] + off_p, j + off_w};
                     continue;
                 }
-                int x = j + off_p;
-                int y = dp[i][j] + off_w;
+                int x = dp[i][j] + off_p;
+                int y = j + off_w;
                 if(knapsack_wt.first * y <= knapsack_wt.second * x) {
                     knapsack_wt = {x, y};
                     knapsack_sol = {i, j};
@@ -243,7 +253,7 @@ returnSet RATIO_KNAPSACK(vector<int> &nodes, vector<int> &profits, vector<int> &
     while(true) {
         if(!x && !y) break;
         U.addNode(nodes[x - 1], profits[x - 1], weights[x - 1]);
-        y -= profits[x - 1];
+        y -= weights[x - 1];
         x--;
         while(last[x][y] == -1) x--;
     }
@@ -257,7 +267,6 @@ returnSet BEST_PROFIT_VIABLE(graph G, int k) {
         if(G.getWeight(center) > k) continue;
         vector<int> nodes, profits, weights;
         bool isSingle = true;
-        int CLIMIT = 0, PLIMIT = 0;
         for(int u : G.adj[G.indexInNodes[center]]) {
             if(!G.isActiveIndex(u)) continue;
             int c_cap = G.old_degree[u] - G.degree[u] + 1;
@@ -266,12 +275,14 @@ returnSet BEST_PROFIT_VIABLE(graph G, int k) {
             profits.push_back(c_cap * ALPHA + p_cap * BETA);
             weights.push_back(G.nodes[u].w);
             isSingle = false;
-            CLIMIT += c_cap;
-            PLIMIT += p_cap;
         }
-        returnSet Z = PROFIT_KNAPSACK(nodes, profits, weights, k - G.getWeight(center), CLIMIT, PLIMIT);
+        int x = G.indexInNodes[center];
+        int off_p = (G.old_degree[x] - G.degree[x]) * ALPHA + G.getProfit(center) * BETA;
+        int off_w = G.getWeight(center);
+        returnSet Z = PROFIT_KNAPSACK(nodes, profits, weights, k - G.getWeight(center));
         if(!isSingle && Z.isEmpty()) continue;
-        Z.addNode(center, BETA * G.getProfit(center), G.getWeight(center));
+        if(isSingle) continue;
+        Z.addNode(center, off_p, off_w);
         if(U.totalProfit < Z.totalProfit)
             U = Z;
     }
@@ -284,7 +295,6 @@ returnSet BEST_RATIO_VIABLE(graph G, int k) {
         if(G.getWeight(center) > k) continue;
         vector<int> nodes, profits, weights;
         bool isSingle = true;
-        int CLIMIT = 0, PLIMIT = 0;
         for(int u : G.adj[G.indexInNodes[center]]) {
             if(!G.isActiveIndex(u)) continue;
             int c_cap = G.old_degree[u] - G.degree[u] + 1;
@@ -293,13 +303,14 @@ returnSet BEST_RATIO_VIABLE(graph G, int k) {
             profits.push_back(c_cap * ALPHA + p_cap * BETA);
             weights.push_back(G.nodes[u].w);
             isSingle = false;
-            CLIMIT += c_cap;
-            PLIMIT += p_cap;
         }
-        returnSet Z = RATIO_KNAPSACK(nodes, profits, weights, k - G.getWeight(center),
-                G.getProfit(center), G.getWeight(center), CLIMIT, PLIMIT);
+        int x = G.indexInNodes[center];
+        int off_p = (G.old_degree[x] - G.degree[x]) * ALPHA + G.getProfit(center) * BETA;
+        int off_w = G.getWeight(center);
+        returnSet Z = RATIO_KNAPSACK(nodes, profits, weights, k - G.getWeight(center), off_p, off_w);
         if(!isSingle && Z.isEmpty()) continue;
-        Z.addNode(center, BETA * G.getProfit(center), G.getWeight(center));
+        if(isSingle) continue;
+        Z.addNode(center, off_p, off_w);
         if(U.isEmpty()) U = Z;
         else if(U.totalProfit * Z.totalWeight <= U.totalWeight * Z.totalProfit)
             U = Z;
@@ -355,14 +366,30 @@ returnSet GREEDY_1_NEIGHBOUR(graph G, int k) {
     return U;
 }
 
-void printSol(graph &G, int budget) {
-    returnSet U = GREEDY_1_NEIGHBOUR(G, budget);
-    cout << U.totalProfit << "\n";
-    /*cout << "Greedy Solution: ";
+bool verifySolution(returnSet &U, graph &G) {
+    int totalWeight = 0, totalProfit = 0;
+    set<int> curNodes;
     for(int u : U.returnNodes) {
-        cout << u << " ";
+        totalWeight += G.getWeight(u);
+        totalProfit += G.getProfit(u) * BETA;
+        int x = G.indexInNodes[u];
+        for(int v : curNodes) {
+            if(G.adj[x].find(v) != G.adj[x].end())
+                totalProfit += ALPHA;
+        }
+        curNodes.insert(x);
     }
-    cout << "\nTotal Profit: " << U.totalProfit << " Total Weight: " << U.totalWeight << "\n\n";*/
+    return (U.totalWeight == totalWeight && U.totalProfit == totalProfit);
+}
+
+void printSol(graph &G, int budget) {
+    T.reset();
+    returnSet U = GREEDY_1_NEIGHBOUR(G, budget);
+    assert(verifySolution(U, G));
+    assert(U.totalWeight <= budget);
+
+    cout << U.totalProfit << "\n";
+    cerr << "Done in " << T.elapsed() << ".\n";
 }
 
 void readGraph() {
@@ -379,6 +406,26 @@ void readGraph() {
     printSol(G, budget);
 }
 
+void printGUISol(graph &G, int budget, set<int> &top, set<int> &bottom) {
+    returnSet U = GREEDY_1_NEIGHBOUR(G, budget);
+    assert(verifySolution(U, G));
+    assert(U.totalWeight <= budget);
+    vector<int> Utop, Ubottom;
+    for(int u : U.returnNodes) {
+        if(top.find(u) != top.end())
+            Utop.push_back(u);
+        else Ubottom.push_back(u);
+    }
+    for(int u : Utop) {
+        for(int v : Ubottom) {
+            if(G.isConnected(u, v)) {
+                cout << u << " " << v << "\n";
+            }
+        }
+    }
+
+}
+
 void readAmazonData() {
     int n, m; cin >> n >> m;
     graph G;
@@ -390,24 +437,47 @@ void readAmazonData() {
         int u, v; cin >> u >> v;
         G.addEdge(u, v);
     }
-    int budget = 1000;  //Change budget here
+    int budget = 1000;
+    cin >> ALPHA >> BETA >> budget;
     printSol(G, budget);
+}
+
+void readGuiData() {
+    int n, m; cin >> n >> m;
+    graph G;
+    for(int i = 0; i < n; i++) {
+        int u, p, w; cin >> u >> p >> w;
+        G.addNode(u, p, w);
+    }
+    set<int> top, bottom;
+    for(int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        G.addEdge(u, v);
+        top.insert(u);
+        bottom.insert(v);
+    }
+    int budget, alpha, beta;
+    cin >> budget >> alpha >> beta;
+    ALPHA = alpha; BETA = beta;
+    printGUISol(G, budget, top, bottom);
 }
 
 signed main()
 {
-    freopen("random_input", "r", stdin);
-    freopen("greedy_result", "w", stdout);
+    freopen("real_data", "r", stdin);
+    //freopen("greedy_result", "w", stdout);
 
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
 
-    int test = 1; cin >> test;
+    int test = 1; //cin >> test;
+    //double avg_time = 0.0;
     for(int cur_test = 1; cur_test <= test; cur_test++) {
         T.reset();
-        readGraph();
+        readGuiData();
         cerr << "Done: " << cur_test << " in " << T.elapsed() << ".\n";
+        //avg_time += T.elapsed();
     }
-
+    //cerr << "\nAvg time: " << avg_time / test << "\n";
     return 0;
 }
