@@ -29,7 +29,7 @@ For example, in case of Amazon-1 dataset:
     $bash run.sh
     Enter Dataset File Path: ./Datasets/Amazon-1/input_graph.txt
     
-Results are stored in *result/result.txt*
+Results are stored in *result/result.csv*
 
 To get the results for real-value edge-weighted graph, execute run_prob.sh script.
 
@@ -37,3 +37,5 @@ For example, in case of Amazon-1 dataset:
 
     $bash run_prob.sh
     Enter Dataset File Path: ./Datasets/Amazon-1/input_graph_prob.txt
+
+Results are stored in *result/result.csv*
