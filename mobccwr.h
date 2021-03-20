@@ -292,8 +292,6 @@ struct GRAPH {
 
 		if(K < MIN_OUTFIT_COST - 1e-9) return {itemsEdge, itemsRatio};
 
-		cerr << (int)EdgeQueue.size() << endl;
-
 		while(!EdgeQueue.empty()) {
 			auto it = EdgeQueue.top();
 
@@ -327,8 +325,6 @@ struct GRAPH {
 			break;
 		}
 
-		cerr << (int)EdgeQueue.size() << endl;
-
 		return {itemsEdge, itemsRatio};
 	}
 
@@ -338,8 +334,6 @@ struct GRAPH {
 		TRATIO itemRatio = 0.0;
 
 		if(K < MIN_ITEM_COST - 1e-9) return {itemNode, itemRatio};
-
-		cerr << (int)ItemQueue.size() << endl;
 
 		while(!ItemQueue.empty()) {
 			auto it = ItemQueue.top();
@@ -374,8 +368,6 @@ struct GRAPH {
 
 			break;
 		}
-
-		cerr << (int)ItemQueue.size() << endl;
 
 		return {itemNode, itemRatio};
 	} 
