@@ -9,6 +9,8 @@ We make use of three real world e-commerce datasets.
 2) Datasets/Amazon-2
 3) Datasets/Polyvore
 
+Our algorithms are implemeted in C++ (g++ complier with version (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0), and data preprocessing has been done in python3 (with version 3.6.9).
+
 To generate graph for each dataset csv, run the *script.sh* from the respective folder. And to generate real-value edge-weighted graph for each dataset csv, run the *script_prob.sh* from the respective folder.
 
 For example, in case of Amazon-1 dataset:
@@ -36,3 +38,16 @@ For example, in case of Amazon-1 dataset:
     Enter Dataset File Path: ./Datasets/Amazon-1/input_graph_prob.txt
 
 Results are stored in *result/result.csv*
+
+Please cite our paper.
+
+        @article {
+                PatilBanerjee:2021:MOBCCWR,
+                author = {Shubham Patil and Debopriyo Banerjee and Shamik Sural}, 
+                title = {A Graph Theoretic Approach for Multi-Objective Budget Constrained Capsule Wardrobe Recommendation}, 
+                booktitle = {ACM Transactions on Information Systems}, 
+                volume = {1}, 
+                number = {1}, 
+                pages = {1:1--1:33}, 
+                year = {2021} 
+        }
