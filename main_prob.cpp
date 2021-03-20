@@ -319,7 +319,7 @@ int main()
 	PREPROCESS_INIT();
 	cout << "Done Preprocessing in " << fixed << setprecision(2) << timer.elapsed() << "s.\n\n";
 
-	string outPath = "./result/result.txt";
+	string outPath = "./result/result.csv";
 	ofstream out(outPath);
 
 	cout << "Analyzing the data...\n";
@@ -331,7 +331,7 @@ int main()
 
 	out << "MAIN RESULT\n";
 	out << "Note: Execution time is in milliseconds and prices are in USD.\n\n";
-	out << "Budget\t" << "Alpha\t" << "Beta\t" << "ResultMain\t" << "ExecutionMain\t" << "NumTopMain\t" << "NumBottomMain\t" << "NumCompOutfitsMain\t" << "ResultRatio\t" << "ResultPseudo\n";
+	out << "Budget\t" << "Alpha\t" << "Beta\t" << "TotalProfitReturn\t" << "ExecutionTime (in ms)\t" << "NumTopMain\t" << "NumBottomMain\t" << "NumCompOutfitsMain\t" << "ProfitBestRatioEdge\t" << "ProfitBestPseudoNodes\n";
 
 	cout << "Running algorithm...\n";
 	for(int i = 0; i < 5; i++) {
