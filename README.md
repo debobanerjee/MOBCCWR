@@ -2,9 +2,6 @@ A Graph Theoretic Approach for Multi-Objective Budget
 Constrained Capsule Wardrobe Recommendation
 ====
 
-Introduction
-----
-
 Usage
 ----
 We make use of three real world e-commerce datasets.
